@@ -1,6 +1,6 @@
 # 🚀 Backend Staj Hazırlık Projesi
 
-Bu depo, backend geliştirme stajıma hazırlık sürecinde öğrendiğim teknolojileri ve yaptığım pratikleri içermektedir. Proje, 7 günlük yoğun bir çalışma programının adımlarını takip etmektedir.
+Bu depo, backend geliştirme stajıma hazırlık sürecinde öğrendiğim teknolojileri ve yaptığım pratikleri içermektedir. 
 
 ## 🛠 Kullanılan Teknolojiler
 * **Dil:** Java (JDK 17/21)
