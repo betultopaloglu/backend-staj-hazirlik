@@ -1,0 +1,79 @@
+-- 1. YARIM KALAN TABLOLARI TEMİZLEME (Çakışmayı Önler)
+DROP TABLE IF EXISTS work_logs CASCADE;
+DROP TABLE IF EXISTS user_projects CASCADE;
+DROP TABLE IF EXISTS projects CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- 2. TABLOLARI SIFIRDAN OLUŞTURMA
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    project_name VARCHAR(100) NOT NULL,
+    owner_id INT REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE user_projects (
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, project_id)
+);
+
+CREATE TABLE work_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
+    work_date DATE NOT NULL,
+    hours INT NOT NULL
+);
+
+-- 3. ÖRNEK VERİLERİ EKLEME
+INSERT INTO users (first_name, last_name, email) VALUES
+('Betül', 'Topaloğlu', 'betul@example.com'),
+('Barış', 'Yılmaz', 'baris@example.com'),
+('Uğurcan', 'Demir', 'ugurcan@example.com');
+
+INSERT INTO projects (project_name, owner_id) VALUES
+('Backend Staj Projesi', 1),
+('Banka Otomasyonu', 2),
+('E-Ticaret Mobil', 1);
+
+INSERT INTO user_projects (user_id, project_id) VALUES
+(1, 1),
+(1, 3),
+(2, 2),
+(3, 1);
+
+INSERT INTO work_logs (user_id, project_id, work_date, hours) VALUES
+(1, 1, '2026-08-01', 5),
+(1, 1, '2026-08-02', 8),
+(2, 2, '2026-08-01', 6),
+(2, 2, '2026-08-02', 4),
+(3, 1, '2026-08-01', 7);
+
+/* ,smi B ile başlayan kulanıcılar*/
+select * from users where first_name like 'B%';
+
+/*Proje bazlı toplam ve en fazla çalışılan saatler*/
+SELECT
+    p.project_name,
+    SUM(w.hours) AS toplam_calisma_saati,
+    MAX(w.hours) AS en_fazla_tek_seferde_calisilan_saat
+FROM work_logs w
+JOIN projects p ON w.project_id = p.id
+GROUP BY p.project_name;
+
+/*Kullanıcıların toplam çalışma saatlerini büyükten küçüğe sırala*/
+SELECT
+    u.first_name,
+    u.last_name,
+    SUM(w.hours) AS genel_toplam_saat
+FROM work_logs w
+JOIN users u ON w.user_id = u.id
+GROUP BY u.id, u.first_name, u.last_name
+ORDER BY genel_toplam_saat DESC;
